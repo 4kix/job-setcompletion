@@ -11,33 +11,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-public class AbstractController<T extends BaseModel> {
+public abstract class AbstractController<T extends BaseModel> {
 
     private AbstractManager<T> abstractManager;
 
+    public AbstractController() {}
+
     public AbstractController(AbstractManager<T> abstractManager) {this.abstractManager = abstractManager ;}
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<String> create(@RequestBody T task)
-    {
-        T taskResponse = abstractManager.createTaskModel(task.getBody(), task.getCurrentStatus());
-        return new ResponseEntity<String>(taskResponse.getId(), HttpStatus.CREATED);
-    }
+    public abstract ResponseEntity<String> create(@RequestBody T task);
 
-    @RequestMapping(value="/{id}", method = RequestMethod.GET)
-    public ResponseEntity<String> getCurrentState(@PathVariable String id)
-    {
-        String state = abstractManager.getTaskState(id);
-        return new ResponseEntity<String>(state, HttpStatus.OK);
-    }
+    public abstract ResponseEntity<String> getCurrentState(@PathVariable String id);
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> deleteTask(@PathVariable String id)
-    {
-        abstractManager.deleteTask(id);
-        return new ResponseEntity<String>("Deleted", HttpStatus.OK);
-    }
-
-
+    public abstract ResponseEntity<String> deleteTask(@PathVariable String id);
 
 }
