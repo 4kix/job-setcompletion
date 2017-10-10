@@ -1,5 +1,7 @@
 package com.iba.schedule.manager;
 
+import com.iba.schedule.bo.TaskBO;
+import com.iba.schedule.model.Task;
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +9,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     private List<TaskResponseModel> taskResponseModels = new ArrayList<>();
+
+    //new map
+    private ConcurrentMap<String, Task> tasks = new ConcurrentHashMap<>();
 
     @Autowired
     UUIDGenerator uuidGenerator;
@@ -21,6 +28,10 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         String id = uuidGenerator.generateUUID();
         TaskResponseModel taskResponseModel = new TaskResponseModel(id, body, currentState);
         taskResponseModels.add(taskResponseModel);
+
+        /*TaskBO taskBO = new TaskBO();
+        taskBO.createNewTask(id);*/
+
         return taskResponseModel;
     }
 
