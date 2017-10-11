@@ -25,6 +25,6 @@ public class Task implements Runnable {
             e.printStackTrace();
         }
 
-        model.setCurrentStatus("Done");
+        model.setCurrentStatus("DONE");
     }
 }
