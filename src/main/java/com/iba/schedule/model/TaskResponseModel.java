@@ -2,9 +2,9 @@ package com.iba.schedule.model;
 
 public class TaskResponseModel extends BaseModel {
 
-    private String id;
-    private String body;
-    private String currentStatus;
+    private volatile String id;
+    private volatile String body;
+    private volatile String currentStatus;
 
     public TaskResponseModel(){}
 

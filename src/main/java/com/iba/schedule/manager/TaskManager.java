@@ -7,67 +7,49 @@ import com.iba.schedule.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class TaskManager extends AbstractManager<TaskResponseModel> {
 
-    private List<TaskResponseModel> taskResponseModels = new ArrayList<>();
-
-    //new map
     private ConcurrentMap<String, Thread> activeThreads = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, Task> activeTasks = new ConcurrentHashMap<>(); // Or model? Or store separately from inactive?
 
     @Autowired
     UUIDGenerator uuidGenerator;
 
     @Override
     public TaskResponseModel createTaskModel(String body, String currentState) {
-        String id = uuidGenerator.generateUUID();
-        TaskResponseModel taskResponseModel = new TaskResponseModel(id, body, currentState);
-        taskResponseModels.add(taskResponseModel);
+        String uuid = uuidGenerator.generateUUID();
+        TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
-        /*Thread taskThread = new Thread(new Task(taskResponseModel));*/
+        Task task = new Task(taskResponseModel);
+        Thread taskThread = new Thread(task);
+        activeThreads.put(uuid, taskThread);
+        activeTasks.put(uuid, task);
+        taskThread.start();
 
         return taskResponseModel;
     }
 
     @Override
-    public String getTaskBody(String id) {
-
-        String body = null;
-        for (TaskResponseModel taskResponseModel: taskResponseModels)
-        {
-            if (taskResponseModel.getId().equals(id)) body = taskResponseModel.getBody();
-        }
+    public String getTaskBody(String uuid) {
+        String body = activeTasks.get(uuid).getModel().getBody();
         return body;
     }
 
     @Override
-    public String getTaskState(String id) {
-        String state = null;
-        for (TaskResponseModel taskResponseModel: taskResponseModels)
-        {
-            if (taskResponseModel.getId().equals(id)) state = taskResponseModel.getCurrentStatus();
-        }
+    public String getTaskState(String uuid) {
+        String state = activeTasks.get(uuid).getModel().getCurrentStatus();
         return state;
     }
 
     @Override
-    public void deleteTask(String id) {
-        for (TaskResponseModel taskResponseModel: taskResponseModels)
-        {
-            if (taskResponseModel.getId().equals(id)) taskResponseModels.remove(taskResponseModel);
-        }
-    }
-
-    public List<TaskResponseModel> getTaskResponseModels() {
-        return taskResponseModels;
-    }
-
-    public void setTaskResponseModels(List<TaskResponseModel> taskResponseModels) {
-        this.taskResponseModels = taskResponseModels;
+    public void deleteTask(String uuid) {
+        //TODO close task and kill thread
+        activeThreads.get(uuid).interrupt();
+        activeThreads.remove(uuid); // (Object key, Object value)implementation?
+        activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
     }
 }
