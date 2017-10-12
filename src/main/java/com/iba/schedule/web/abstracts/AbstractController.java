@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.ArrayList;
+
 public class AbstractController<T extends BaseModel> {
 
     private AbstractManager<T> abstractManager;
@@ -37,6 +39,7 @@ public class AbstractController<T extends BaseModel> {
         abstractManager.deleteTask(id);
         return new ResponseEntity<String>("Deleted", HttpStatus.OK);
     }
+
 
 
 
