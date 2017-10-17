@@ -19,11 +19,18 @@ public class AbstractController<T extends BaseModel> {
 
     public AbstractController(AbstractManager<T> abstractManager) {this.abstractManager = abstractManager ;}
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<String> create(@RequestBody T task)
+//    @RequestMapping(value = "", method = RequestMethod.POST)
+//    public ResponseEntity<String> create(@RequestBody T task)
+//    {
+//        T taskResponse = abstractManager.createTaskModel(task.getBody(), task.getCurrentStatus());
+//        return new ResponseEntity<String>(taskResponse.getId(), HttpStatus.CREATED);
+//    }
+
+    @RequestMapping(value="/{id}", method = RequestMethod.POST)
+    public ResponseEntity startTask(@PathVariable String id)
     {
-        T taskResponse = abstractManager.createTaskModel(task.getBody(), task.getCurrentStatus());
-        return new ResponseEntity<String>(taskResponse.getId(), HttpStatus.CREATED);
+        abstractManager.runTask(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value="/{id}", method = RequestMethod.GET)
