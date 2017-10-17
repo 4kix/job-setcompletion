@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 public class Task implements Runnable {
 
-    private TaskResponseModel model;
+    private volatile TaskResponseModel model;
 
     private static final AtomicReferenceFieldUpdater<Task, TaskResponseModel> updater =
             AtomicReferenceFieldUpdater.newUpdater(Task.class, TaskResponseModel.class, "model");
@@ -39,4 +39,5 @@ public class Task implements Runnable {
     public void setModel(TaskResponseModel model) {
         updater.compareAndSet(this, this.model, model);
     }
+
 }

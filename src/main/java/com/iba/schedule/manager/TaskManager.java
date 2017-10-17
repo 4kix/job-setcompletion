@@ -2,6 +2,7 @@ package com.iba.schedule.manager;
 
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
+import com.iba.schedule.threadpool.manager.ThreadPoolManager;
 import com.iba.schedule.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,10 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public class TaskManager extends AbstractManager<TaskResponseModel> {
 
-    private ConcurrentMap<String, Thread> activeThreads = new ConcurrentHashMap<>();
+    //private ConcurrentMap<String, Thread> activeThreads = new ConcurrentHashMap<>();
     private ConcurrentMap<String, Task> activeTasks = new ConcurrentHashMap<>(); // Or model? Or store separately from inactive?
+
+    //private ThreadPoolManager threadPoolManager = ThreadPoolManager.getInstance();
 
     @Autowired
     UUIDGenerator uuidGenerator;
@@ -25,10 +28,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
         Task task = new Task(taskResponseModel);
-        Thread taskThread = new Thread(task);
-        activeThreads.put(uuid, taskThread);
+        //Thread taskThread = new Thread(task);
+        //activeThreads.put(uuid, taskThread);
         activeTasks.put(uuid, task);
-        taskThread.start();
+        //taskThread.start();
+
+        ThreadPoolManager.getInstance().execute(task);
 
         return taskResponseModel;
     }
@@ -48,8 +53,9 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     @Override
     public void deleteTask(String uuid) {
         //TODO close task and kill thread
-        activeThreads.get(uuid).interrupt();
-        activeThreads.remove(uuid); // (Object key, Object value)implementation?
+        //activeThreads.get(uuid).interrupt();
+        //activeThreads.remove(uuid); // (Object key, Object value)implementation?
+        ThreadPoolManager.getInstance().stopThread(uuid);
         activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
     }
 
@@ -59,4 +65,6 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
         System.out.println(threadSet);
     }
+
+
 }
