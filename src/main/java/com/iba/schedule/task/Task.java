@@ -3,11 +3,15 @@ package com.iba.schedule.task;
 import com.iba.schedule.model.TaskResponseModel;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 
 public class Task implements Runnable {
 
     private TaskResponseModel model;
+
+    private static final AtomicReferenceFieldUpdater<Task, TaskResponseModel> updater =
+            AtomicReferenceFieldUpdater.newUpdater(Task.class, TaskResponseModel.class, "model");
 
     public Task(TaskResponseModel taskResponseModel) {
         this.model = taskResponseModel;
@@ -25,9 +29,14 @@ public class Task implements Runnable {
         }
 
         model.setCurrentStatus("DONE");
+        System.out.println("THREAD STOPPED");
     }
 
     public TaskResponseModel getModel() {
-        return model;
+        return updater.get(this);
+    }
+
+    public void setModel(TaskResponseModel model) {
+        updater.compareAndSet(this, this.model, model);
     }
 }

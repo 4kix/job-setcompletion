@@ -1,12 +1,12 @@
 package com.iba.schedule.manager;
 
-
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
 import com.iba.schedule.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -51,5 +51,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         activeThreads.get(uuid).interrupt();
         activeThreads.remove(uuid); // (Object key, Object value)implementation?
         activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
+    }
+
+
+    @Override
+    public void getJVMThreads() {
+        Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+        System.out.println(threadSet);
     }
 }

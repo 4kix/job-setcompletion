@@ -37,4 +37,9 @@ public class TaskController extends AbstractController<TaskResponseModel>{
         abstractManager.deleteTask(id);
         return new ResponseEntity<String>("Deleted", HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/threadsJVM", method = RequestMethod.GET)
+    public void getAllJVMThreads() {
+        abstractManager.getJVMThreads();
+    }
 }
