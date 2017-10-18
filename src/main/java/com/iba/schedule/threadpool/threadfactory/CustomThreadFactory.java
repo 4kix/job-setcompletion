@@ -2,6 +2,7 @@ package com.iba.schedule.threadpool.threadfactory;
 
 import com.iba.schedule.task.Task;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadFactory;
@@ -34,12 +35,31 @@ public class CustomThreadFactory implements ThreadFactory {
         if (t.getPriority() != Thread.NORM_PRIORITY)
             t.setPriority(Thread.NORM_PRIORITY);
 
-        //TODO check instance of Runnable?
-        //addThreadToRunningThreads(((Task)r).getModel().getId(), t);
+        try {
+            Task task = getTaskFromWorker(r);
+            addThreadToRunningThreads(task.getModel().getId(), t);
+        } catch (NoSuchFieldException e) {
+            System.err.println("this shit doesn't work");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         return t;
     }
 
     private void addThreadToRunningThreads(String uuid, Thread thread) {
         runningThreads.put(uuid, thread);
+    }
+
+
+    //Kludge
+    private Task getTaskFromWorker(Runnable worker) throws NoSuchFieldException, IllegalAccessException {
+        Class<?> workerClass = worker.getClass();
+
+        Field firstTask= workerClass.getDeclaredField("firstTask");
+        firstTask.setAccessible(true);
+        Task value = (Task) firstTask.get(worker);
+
+        return value;
     }
 }

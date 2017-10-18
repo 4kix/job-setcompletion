@@ -13,6 +13,7 @@ public class Task implements Runnable {
     private static final AtomicReferenceFieldUpdater<Task, TaskResponseModel> updater =
             AtomicReferenceFieldUpdater.newUpdater(Task.class, TaskResponseModel.class, "model");
 
+    public Task() {super();}
     public Task(TaskResponseModel taskResponseModel) {
         this.model = taskResponseModel;
     }
@@ -30,6 +31,7 @@ public class Task implements Runnable {
 
         model.setCurrentStatus("DONE");
         System.out.println("THREAD STOPPED");
+
     }
 
     public TaskResponseModel getModel() {
@@ -39,5 +41,4 @@ public class Task implements Runnable {
     public void setModel(TaskResponseModel model) {
         updater.compareAndSet(this, this.model, model);
     }
-
 }
