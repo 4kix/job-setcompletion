@@ -18,4 +18,6 @@ public abstract class AbstractManager<T extends BaseModel> {
 
     public abstract void runTask(String id);
 
+    public abstract void getJVMThreads();
+
 }
