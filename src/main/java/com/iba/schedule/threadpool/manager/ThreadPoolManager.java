@@ -21,7 +21,8 @@ public class ThreadPoolManager {
         threadFactory =  new CustomThreadFactory(runningThreads); //Executors.defaultThreadFactory();
 
         //TODO choose normal executor parameters
-        executorPool = new ThreadPoolExecutor(2, 8, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2), threadFactory, rejectionHandler);
+        executorPool = new ThreadPoolExecutor(2, 8, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1), threadFactory, rejectionHandler);
+        //executorPool.allowCoreThreadTimeOut(true);
         monitor = new MyMonitorThread(executorPool, 5);
         Thread monitorThread = new Thread(monitor);
         monitorThread.start();
