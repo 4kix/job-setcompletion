@@ -43,6 +43,14 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     }
 
     @Override
+    public void createTaskModel(String UUID) {
+        logger.info("Run task with id: " + UUID);
+        Task task = activeTasks.get(UUID);
+        ThreadPoolManager.getInstance().execute(task);
+    }
+
+
+    @Override
     public void runTask(String id)
     {
         Runnable r = activeTasks.get(id);
