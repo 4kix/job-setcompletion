@@ -3,6 +3,7 @@ package com.iba.schedule.manager;
 
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
+import com.iba.schedule.threadpool.manager.ThreadPoolManager;
 import com.iba.schedule.util.UUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
         Task task = new Task(taskResponseModel);
         logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getId());
-        Thread taskThread = new Thread(task);
-        activeThreads.put(uuid, taskThread);
+        //Thread taskThread = new Thread(task);
+        //activeThreads.put(uuid, taskThread);
         activeTasks.put(uuid, task);
-        taskThread.start();
+        //taskThread.start();
+
+        ThreadPoolManager.getInstance().execute(task);
 
         return taskResponseModel;
     }
@@ -65,9 +68,9 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     @Override
     public void deleteTask(String uuid) {
         //TODO close task and kill thread
-        logger.info("Stop task: " + uuid);
-        activeThreads.get(uuid).interrupt();
-        activeThreads.remove(uuid); // (Object key, Object value)implementation?
+        //activeThreads.get(uuid).interrupt();
+        //activeThreads.remove(uuid); // (Object key, Object value)implementation?
+        ThreadPoolManager.getInstance().stopThread(uuid);
         activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
     }
 
