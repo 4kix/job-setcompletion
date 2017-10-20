@@ -1,15 +1,15 @@
 package com.iba.schedule.web.abstracts;
-
-
 import com.iba.schedule.manager.AbstractManager;
 import com.iba.schedule.model.BaseModel;
 import com.iba.schedule.model.TaskResponseModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
 
 public abstract class AbstractController<T extends BaseModel> {
 
@@ -21,8 +21,9 @@ public abstract class AbstractController<T extends BaseModel> {
 
     public abstract ResponseEntity<String> create(@RequestBody T task);
 
-    public abstract ResponseEntity<String> getCurrentState(@PathVariable String id);
+    public abstract ResponseEntity<String> getCurrentState(@RequestHeader String id);
 
-    public abstract ResponseEntity<String> deleteTask(@PathVariable String id);
+    public abstract ResponseEntity<String> deleteTask(@RequestHeader String id);
+
 
 }

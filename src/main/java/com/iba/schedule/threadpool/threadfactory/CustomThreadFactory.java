@@ -1,6 +1,8 @@
 package com.iba.schedule.threadpool.threadfactory;
 
 import com.iba.schedule.task.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +15,8 @@ public class CustomThreadFactory implements ThreadFactory {
     private final ThreadGroup group;
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomThreadFactory.class);
 
     private ConcurrentMap<String, Thread> runningThreads;
 
@@ -27,22 +31,26 @@ public class CustomThreadFactory implements ThreadFactory {
     }
 
     public Thread newThread(Runnable r) {
+
+        Task task = getTaskFromWorker(r);
         Thread t = new Thread(group, r,
                 namePrefix + threadNumber.getAndIncrement(),
-                0);
-        if (t.isDaemon())
-            t.setDaemon(false);
-        if (t.getPriority() != Thread.NORM_PRIORITY)
-            t.setPriority(Thread.NORM_PRIORITY);
+                0) {
+            @Override
+            public void interrupt() {
+                task.cancel();
+                super.interrupt();
 
-        try {
-            Task task = getTaskFromWorker(r);
-            addThreadToRunningThreads(task.getModel().getId(), t);
-        } catch (NoSuchFieldException e) {
-            System.err.println("this shit doesn't work");
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            }
+        };
+        if (t.isDaemon()) {
+            t.setDaemon(false);
         }
+        if (t.getPriority() != Thread.NORM_PRIORITY) {
+            t.setPriority(Thread.NORM_PRIORITY);
+        }
+
+        addThreadToRunningThreads(task.getModel().getId(), t);
 
         return t;
     }
@@ -53,13 +61,18 @@ public class CustomThreadFactory implements ThreadFactory {
 
 
     //Kludge
-    private Task getTaskFromWorker(Runnable worker) throws NoSuchFieldException, IllegalAccessException {
-        Class<?> workerClass = worker.getClass();
+    private Task getTaskFromWorker(Runnable worker){
+        try {
+            Class<?> workerClass = worker.getClass();
 
-        Field firstTask= workerClass.getDeclaredField("firstTask");
-        firstTask.setAccessible(true);
-        Task value = (Task) firstTask.get(worker);
+            Field firstTask= workerClass.getDeclaredField("firstTask");
+            firstTask.setAccessible(true);
+            Task value = (Task) firstTask.get(worker);
 
-        return value;
+            return value;
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            logger.error("this shit doesn't work");
+        }
+        return null;
     }
 }
