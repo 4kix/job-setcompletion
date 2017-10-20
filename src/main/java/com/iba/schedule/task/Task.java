@@ -49,4 +49,9 @@ public class Task implements Runnable {
     public void setModel(TaskResponseModel model) {
         updater.compareAndSet(this, this.model, model);
     }
+
+    public void cancel() {
+        //TODO close streams and connections
+        logger.info("cancel method invoked");
+    }
 }
