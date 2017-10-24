@@ -44,6 +44,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public void createTaskModel(String UUID) {
+        //TODO rewrite for creating new, not for starting existing task
         logger.info("Run task with id: " + UUID);
         Task task = activeTasks.get(UUID);
         ThreadPoolManager.getInstance().execute(task);
@@ -54,8 +55,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     public void runTask(String id)
     {
         Runnable r = activeTasks.get(id);
-        Thread t  = new Thread(r);
-        t.start();
+        ThreadPoolManager.getInstance().execute(r);
         logger.info("Started task with id: " + id);
     }
 

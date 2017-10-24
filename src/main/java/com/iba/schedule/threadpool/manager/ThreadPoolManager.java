@@ -21,8 +21,8 @@ public class ThreadPoolManager {
         threadFactory =  new CustomThreadFactory(runningThreads); //Executors.defaultThreadFactory();
 
         //TODO choose normal executor parameters
-        executorPool = new ThreadPoolExecutor(2, 8, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1), threadFactory, rejectionHandler);
-        //executorPool.allowCoreThreadTimeOut(true);
+        executorPool = new ThreadPoolExecutor(2, 8, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3), threadFactory, rejectionHandler);
+        executorPool.allowCoreThreadTimeOut(true);
         monitor = new MyMonitorThread(executorPool, 5);
         Thread monitorThread = new Thread(monitor);
         monitorThread.start();
@@ -49,5 +49,9 @@ public class ThreadPoolManager {
     public void stopThread(String uuid)  {
         runningThreads.get(uuid).interrupt();
         runningThreads.remove(uuid);
+    }
+
+    public void shutdownThread(){
+        executorPool.shutdown();
     }
 }
