@@ -27,14 +27,14 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public TaskResponseModel createTaskModel(String body, String currentState) {
-        String uuid = uuidGenerator.generateUUID();
-        TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
+        String UUID = uuidGenerator.generateUUID();
+        TaskResponseModel taskResponseModel = new TaskResponseModel(UUID, body, currentState);
 
         Task task = new Task(taskResponseModel);
         logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getId());
         //Thread taskThread = new Thread(task);
         //activeThreads.put(uuid, taskThread);
-        activeTasks.put(uuid, task);
+        activeTasks.put(UUID, task);
         //taskThread.start();
 
         ThreadPoolManager.getInstance().execute(task);
@@ -44,9 +44,16 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public void createTaskModel(String UUID) {
-        logger.info("Run task with id: " + UUID);
-        Task task = activeTasks.get(UUID);
+
+        TaskResponseModel taskResponseModel = new TaskResponseModel(UUID);
+        Task task = new Task(taskResponseModel);
+        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getId());
+        //Thread taskThread = new Thread(task);
+        //activeThreads.put(uuid, taskThread);
+        activeTasks.put(UUID, task);
+        //taskThread.start();
         ThreadPoolManager.getInstance().execute(task);
+
     }
 
 

@@ -24,7 +24,7 @@ public class TaskController extends AbstractController<TaskResponseModel>{
 
     public TaskController(AbstractManager<TaskResponseModel> abstractManager) {this.abstractManager = abstractManager ;}
 
-    @RequestMapping(value = "", method = RequestMethod.PUT)
+    @PutMapping
     public ResponseEntity<String> create(@RequestBody TaskResponseModel task)
     {
         TaskResponseModel taskResponse = abstractManager.createTaskModel(task.getBody(), task.getCurrentStatus());
@@ -32,7 +32,7 @@ public class TaskController extends AbstractController<TaskResponseModel>{
         return new ResponseEntity<String>(taskResponse.getId(), HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @PostMapping
     public ResponseEntity<String> run(@RequestHeader String UUID)
     {
         abstractManager.createTaskModel(UUID);
@@ -40,7 +40,7 @@ public class TaskController extends AbstractController<TaskResponseModel>{
         return new ResponseEntity<String>(UUID, HttpStatus.OK);
     }
 
-    @RequestMapping(value="", method = RequestMethod.GET)
+    @GetMapping
     public ResponseEntity<String> getCurrentState(@RequestHeader(value="UUID") String UUID)
     {
         String state = abstractManager.getTaskState(UUID);
@@ -48,7 +48,7 @@ public class TaskController extends AbstractController<TaskResponseModel>{
         return new ResponseEntity<String>(state, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.DELETE)
+    @DeleteMapping
     public ResponseEntity<String> deleteTask(@RequestHeader(value="UUID") String UUID)
     {
         abstractManager.deleteTask(UUID);
