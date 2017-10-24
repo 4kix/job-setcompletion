@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,7 +49,7 @@ public class CustomThreadFactory implements ThreadFactory {
             t.setPriority(Thread.NORM_PRIORITY);
         }
 
-        addThreadToRunningThreads(task.getModel().getId(), t);
+        addThreadToRunningThreads(task.getModel().getUUID(), t);
 
         return t;
     }

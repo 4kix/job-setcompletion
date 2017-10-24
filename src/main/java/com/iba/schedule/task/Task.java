@@ -16,7 +16,6 @@ public class Task implements Runnable {
     private static final AtomicReferenceFieldUpdater<Task, TaskResponseModel> updater =
             AtomicReferenceFieldUpdater.newUpdater(Task.class, TaskResponseModel.class, "model");
 
-    public Task() {super();}
     public Task(TaskResponseModel taskResponseModel) {
         this.model = taskResponseModel;
     }
