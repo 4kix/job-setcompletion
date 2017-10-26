@@ -120,12 +120,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         TaskResponseModel taskModel = null;
         Task task = null;
 
-        try {
+
             task = activeTasks.get(uuid);
-        } catch (NoSuchElementException e) {
-            logger.error("Error: " + e);
-            throw new NoSuchTaskException(e);
-        }
+            if (task == null)
+            {
+                throw new NoSuchTaskException("No such task");
+            }
 
         taskModel = task.getModel();
 
