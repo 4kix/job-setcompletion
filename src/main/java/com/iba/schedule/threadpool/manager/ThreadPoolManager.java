@@ -17,6 +17,7 @@ public class ThreadPoolManager {
     private ThreadFactory threadFactory;
     private ThreadPoolExecutor executorPool;
     private MyMonitorThread monitor;
+    private Thread monitorThread;
 
     private ConcurrentMap<String, Thread> runningThreads= new ConcurrentHashMap<>();
 
@@ -28,21 +29,14 @@ public class ThreadPoolManager {
         executorPool = new ThreadPoolExecutor(2, 8, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3), threadFactory, rejectionHandler);
         executorPool.allowCoreThreadTimeOut(true);
         monitor = new MyMonitorThread(executorPool, 5);
-        Thread monitorThread = new Thread(monitor);
-        monitorThread.start();
-    }
-
-    private static class SingletonHolder {
-        private static final ThreadPoolManager instance = new ThreadPoolManager();
-    }
-
-    public static ThreadPoolManager threadPoolManager()  {
-        return new ThreadPoolManager();
+        monitorThread = new Thread(monitor);
     }
 
     //parameter should be runnable
     public void execute(CancellableRunnable task) {
+        tryStartMonitor();
         executorPool.execute(task);
+        monitor.toZeroTimer();
     }
 
     public void shutdownMonitor() {
@@ -57,5 +51,14 @@ public class ThreadPoolManager {
 
     public void shutdownThread(){
         executorPool.shutdown();
+    }
+
+    private void tryStartMonitor() {
+        if (monitorThread == null) {
+            monitorThread = new Thread(monitor);
+        }
+        if (monitorThread.getState().equals("NEW") || monitorThread.getState().equals("TERMINATED")) {
+            monitorThread.start();
+        }
     }
 }

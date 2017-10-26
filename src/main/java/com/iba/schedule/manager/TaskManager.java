@@ -70,11 +70,16 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     }
 
     @Override
-    public String getTaskState(String uuid) {
+    public Object getTaskState(String uuid) {
         //parse model or status to the TaskController as a string
-        String state = activeTasks.get(uuid).getModel().getCurrentStatus();
-        logger.info("Get task state: " + state);
-        return state;
+        if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("PROCESSING")) {
+            return "PROCESSING";
+        } else if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
+            return activeTasks.get(uuid).getModel();
+        }
+        //String state = activeTasks.get(uuid).getModel().getCurrentStatus();
+        logger.info("Get task state: ");
+        return null;
     }
 
     @Override
