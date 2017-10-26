@@ -5,6 +5,7 @@ import com.iba.schedule.threadpool.handler.RejectedExecutionHandlerImpl;
 import com.iba.schedule.threadpool.monitor.MyMonitorThread;
 import com.iba.schedule.threadpool.threadfactory.CustomThreadFactory;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.*;
 
 public class ThreadPoolManager {
@@ -37,7 +38,7 @@ public class ThreadPoolManager {
     }
 
     //parameter should be runnable
-    public void execute(Runnable task) {
+    public void execute(Runnable task) throws ExecutionException {
         executorPool.execute(task);
     }
 
@@ -46,7 +47,7 @@ public class ThreadPoolManager {
 
     }
 
-    public void stopThread(String uuid)  {
+    public void stopThread(String uuid) throws NoSuchElementException {
         runningThreads.get(uuid).interrupt();
         runningThreads.remove(uuid);
     }

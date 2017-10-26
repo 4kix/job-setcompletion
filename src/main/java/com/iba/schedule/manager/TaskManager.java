@@ -5,14 +5,18 @@ import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
 import com.iba.schedule.threadpool.manager.ThreadPoolManager;
 import com.iba.schedule.util.UUIDGenerator;
+import exception.ExecuteTaskException;
+import exception.NoSuchTaskException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class TaskManager extends AbstractManager<TaskResponseModel> {
@@ -37,7 +41,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         activeTasks.put(UUID, task);
         //taskThread.start();
 
-        ThreadPoolManager.getInstance().execute(task);
+        try {
+            ThreadPoolManager.getInstance().execute(task);
+        } catch (ExecutionException e) {
+            logger.error("Error: " + e);
+            throw new ExecuteTaskException(e);
+        }
 
         return taskResponseModel;
     }
@@ -52,7 +61,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         //activeThreads.put(uuid, taskThread);
         activeTasks.put(UUID, task);
         //taskThread.start();
-        ThreadPoolManager.getInstance().execute(task);
+        try {
+            ThreadPoolManager.getInstance().execute(task);
+        } catch (ExecutionException e) {
+            logger.error("Error: " + e);
+            throw new ExecuteTaskException(e);
+        }
 
     }
 
@@ -60,7 +74,13 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     @Override
     public void runTask(String id)
     {
-        Runnable r = activeTasks.get(id);
+        Runnable r = null;
+        try {
+            r = activeTasks.get(id);
+        } catch (NoSuchElementException e) {
+            logger.error("Error: " + e);
+            throw new NoSuchTaskException(e);
+        }
         Thread t  = new Thread(r);
         t.start();
         logger.info("Started task with id: " + id);
@@ -68,16 +88,60 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public String getTaskBody(String uuid) {
-        String body = activeTasks.get(uuid).getModel().getBody();
+        String body = null;
+        try {
+            body = activeTasks.get(uuid).getModel().getBody();
+        } catch (NoSuchElementException e) {
+            logger.error("Error: " + e);
+            throw new NoSuchTaskException(e);
+        }
         logger.info("Get task body: " + body );
         return body;
     }
 
     @Override
-    public String getTaskState(String uuid) {
-        String state = activeTasks.get(uuid).getModel().getCurrentStatus();
-        logger.info("Get task state: " + state);
-        return state;
+    public Object getTaskState(String uuid) {
+//        //parse model or status to the TaskController as a string
+//        try {
+//            if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("PROCESSING")) {
+//                return "PROCESSING";
+//            } else if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
+//                logger.info("MODEL: " + activeTasks.get(uuid).getModel());
+//                return activeTasks.get(uuid).getModel();
+//            }
+//        } catch (NoSuchElementException e) {
+//            logger.error("Error: " + e);
+//            throw new NoSuchTaskException(e);
+//        }
+//        //String state = activeTasks.get(uuid).getModel().getCurrentStatus();
+//        logger.info("Get task state: ");
+////        return null;
+
+        TaskResponseModel taskModel = null;
+        Task task = null;
+
+        try {
+            task = activeTasks.get(uuid);
+        } catch (NoSuchElementException e) {
+            logger.error("Error: " + e);
+            throw new NoSuchTaskException(e);
+        }
+
+        taskModel = task.getModel();
+
+        logger.info("TASK: " + task.toString());
+        logger.info("TASK_MODEL:" +taskModel.toString()    );
+
+
+        if (taskModel.getCurrentStatus().equals("PROCESSING")) {
+            return "PROCESSING";
+        } else if (taskModel.getCurrentStatus().equals("OK")) {
+            logger.info("MODEL: " + activeTasks.get(uuid).getModel());
+            return activeTasks.get(uuid).getModel();
+        }
+        logger.info("Get task state: ");
+        return null;
+
     }
 
     @Override
@@ -85,8 +149,13 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         //TODO close task and kill thread
         //activeThreads.get(uuid).interrupt();
         //activeThreads.remove(uuid); // (Object key, Object value)implementation?
-        ThreadPoolManager.getInstance().stopThread(uuid);
-        activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
+        try {
+            ThreadPoolManager.getInstance().stopThread(uuid);
+            activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
+        } catch (NoSuchElementException e) {
+            logger.error("Error: " + e);
+            throw new NoSuchTaskException(e);
+        }
     }
 
     @Override

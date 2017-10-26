@@ -28,7 +28,7 @@ public class Task implements Runnable {
         model.setCurrentStatus("PROCESSING");
         logger.info("TASK STARTED");
         try {
-            TimeUnit.SECONDS.sleep(30);
+            TimeUnit.SECONDS.sleep(15);
         } catch (InterruptedException e) {
             logger.error("Thread sleep failed");
             taskStatus = false;
@@ -36,7 +36,7 @@ public class Task implements Runnable {
         }
 
         if(taskStatus){
-            model.setCurrentStatus("DONE");
+            model.setCurrentStatus("OK");
         }
         logger.info("TASK STOPPED");
 
