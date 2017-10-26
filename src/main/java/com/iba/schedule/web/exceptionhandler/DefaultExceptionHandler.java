@@ -1,7 +1,7 @@
 package com.iba.schedule.web.exceptionhandler;
 
-import exception.ExecuteTaskException;
-import exception.NoSuchTaskException;
+import com.iba.schedule.exception.ExecuteTaskException;
+import com.iba.schedule.exception.NoSuchTaskException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

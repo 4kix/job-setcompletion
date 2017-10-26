@@ -1,4 +1,4 @@
-package exception;
+package com.iba.schedule.exception;
 
 public class NoSuchTaskException extends RuntimeException {
 
