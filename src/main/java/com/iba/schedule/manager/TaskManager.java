@@ -3,6 +3,7 @@ package com.iba.schedule.manager;
 
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
+import com.iba.schedule.task.interfaces.CancellableRunnable;
 import com.iba.schedule.threadpool.manager.ThreadPoolManager;
 import com.iba.schedule.util.UUIDGenerator;
 import org.slf4j.Logger;
@@ -56,8 +57,8 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     @Override
     public void runTask(String id)
     {
-        Runnable r = activeTasks.get(id);
-        threadPoolManager.execute(r);
+        Task task = activeTasks.get(id);
+        threadPoolManager.execute(task);
         logger.info("Started task with id: " + id);
     }
 

@@ -1,6 +1,7 @@
 package com.iba.schedule.task;
 
 import com.iba.schedule.model.TaskResponseModel;
+import com.iba.schedule.task.interfaces.CancellableRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 
-public class Task implements Runnable {
+public class Task implements CancellableRunnable {
 
     private volatile TaskResponseModel model;
 
@@ -53,5 +54,10 @@ public class Task implements Runnable {
     public void cancel() {
         //TODO close streams and connections
         logger.info("cancel method invoked");
+    }
+
+    @Override
+    public String getRunnableUUID() {
+        return this.model.getUUID();
     }
 }

@@ -1,5 +1,6 @@
 package com.iba.schedule.threadpool.manager;
 
+import com.iba.schedule.task.interfaces.CancellableRunnable;
 import com.iba.schedule.threadpool.handler.RejectedExecutionHandlerImpl;
 import com.iba.schedule.threadpool.monitor.MyMonitorThread;
 import com.iba.schedule.threadpool.threadfactory.CustomThreadFactory;
@@ -40,7 +41,7 @@ public class ThreadPoolManager {
     }
 
     //parameter should be runnable
-    public void execute(Runnable task) {
+    public void execute(CancellableRunnable task) {
         executorPool.execute(task);
     }
 
