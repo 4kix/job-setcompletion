@@ -57,7 +57,7 @@ public class ThreadPoolManager {
         if (monitorThread == null) {
             monitorThread = new Thread(monitor);
         }
-        if (monitorThread.getState().equals("NEW") || monitorThread.getState().equals("TERMINATED")) {
+        if ("NEW".equals(monitorThread.getState().toString()) || "TERMINATED".equals(monitorThread.getState().toString())) {
             monitorThread.start();
         }
     }
