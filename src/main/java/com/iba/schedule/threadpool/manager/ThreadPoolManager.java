@@ -1,12 +1,15 @@
 package com.iba.schedule.threadpool.manager;
 
-import com.iba.schedule.task.Task;
 import com.iba.schedule.threadpool.handler.RejectedExecutionHandlerImpl;
 import com.iba.schedule.threadpool.monitor.MyMonitorThread;
 import com.iba.schedule.threadpool.threadfactory.CustomThreadFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.*;
 
+@Service
 public class ThreadPoolManager {
 
     private RejectedExecutionHandler rejectionHandler;
@@ -29,11 +32,11 @@ public class ThreadPoolManager {
     }
 
     private static class SingletonHolder {
-        public static final ThreadPoolManager instance = new ThreadPoolManager();
+        private static final ThreadPoolManager instance = new ThreadPoolManager();
     }
 
-    public static ThreadPoolManager getInstance()  {
-        return SingletonHolder.instance;
+    public static ThreadPoolManager threadPoolManager()  {
+        return new ThreadPoolManager();
     }
 
     //parameter should be runnable

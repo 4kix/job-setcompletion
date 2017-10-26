@@ -21,7 +21,7 @@ public abstract class AbstractController<T extends BaseModel> {
 
     public abstract ResponseEntity<String> create(@RequestBody T task);
 
-    public abstract ResponseEntity<String> run(@RequestHeader String UUID);
+    public abstract ResponseEntity<String> create(@RequestHeader String UUID);
 
     public abstract ResponseEntity<String> getCurrentState(@RequestHeader String UUID);
 

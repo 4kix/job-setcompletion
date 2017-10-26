@@ -24,6 +24,8 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Autowired
     UUIDGenerator uuidGenerator;
+    @Autowired
+    ThreadPoolManager threadPoolManager;
 
     @Override
     public TaskResponseModel createTaskModel(String body, String currentState) {
@@ -37,7 +39,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         activeTasks.put(uuid, task);
         //taskThread.start();
 
-        ThreadPoolManager.getInstance().execute(task);
+        threadPoolManager.execute(task);
 
         return taskResponseModel;
     }
@@ -47,7 +49,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         //TODO rewrite for creating new, not for starting existing task
         logger.info("Run task with id: " + UUID);
         Task task = activeTasks.get(UUID);
-        ThreadPoolManager.getInstance().execute(task);
+        threadPoolManager.execute(task);
     }
 
 
@@ -55,7 +57,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     public void runTask(String id)
     {
         Runnable r = activeTasks.get(id);
-        ThreadPoolManager.getInstance().execute(r);
+        threadPoolManager.execute(r);
         logger.info("Started task with id: " + id);
     }
 
@@ -68,6 +70,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public String getTaskState(String uuid) {
+        //parse model or status to the TaskController as a string
         String state = activeTasks.get(uuid).getModel().getCurrentStatus();
         logger.info("Get task state: " + state);
         return state;
@@ -78,7 +81,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         //TODO close task and kill thread
         //activeThreads.get(uuid).interrupt();
         //activeThreads.remove(uuid); // (Object key, Object value)implementation?
-        ThreadPoolManager.getInstance().stopThread(uuid);
+        threadPoolManager.stopThread(uuid);
         activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
     }
 
