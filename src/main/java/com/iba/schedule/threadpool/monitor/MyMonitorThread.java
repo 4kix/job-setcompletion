@@ -8,12 +8,15 @@ public class MyMonitorThread implements Runnable
 
     private int seconds;
 
+    private volatile int timer;
+
     private boolean run=true;
 
     public MyMonitorThread(ThreadPoolExecutor executor, int delay)
     {
         this.executor = executor;
-        this.seconds=delay;
+        this.seconds = delay;
+        this.timer = 15 / delay;
     }
 
     public void shutdown(){
@@ -24,6 +27,10 @@ public class MyMonitorThread implements Runnable
     public void run()
     {
         while(run){
+            if (this.executor.getActiveCount() == 0) {
+                timer --;
+                if (timer <= 0 ) shutdown();
+            }
             System.out.println(
                     String.format("[monitor] [%d/%d] Active: %d, Completed: %d, Task: %d, isShutdown: %s, isTerminated: %s",
                             this.executor.getPoolSize(),
@@ -41,5 +48,9 @@ public class MyMonitorThread implements Runnable
             }
 
         }
+    }
+
+    public void toZeroTimer() {
+        timer = 15 / seconds;
     }
 }

@@ -28,16 +28,16 @@ public class TaskController extends AbstractController<TaskResponseModel>{
     public ResponseEntity<String> create(@RequestBody TaskResponseModel task)
     {
         TaskResponseModel taskResponse = abstractManager.createTaskModel(task.getBody(), task.getCurrentStatus());
-        logger.info("Run task: " + taskResponse.getId());
-        return new ResponseEntity<String>(taskResponse.getId(), HttpStatus.CREATED);
+        logger.info("Run task: " + taskResponse.getUUID());
+        return new ResponseEntity<String>(taskResponse.getUUID(), HttpStatus.ACCEPTED);
     }
 
     @PostMapping
-    public ResponseEntity<String> run(@RequestHeader String UUID)
+    public ResponseEntity<String> create(@RequestHeader String UUID)
     {
         abstractManager.createTaskModel(UUID);
         logger.info("Run task: " + UUID);
-        return new ResponseEntity<String>(UUID, HttpStatus.OK);
+        return new ResponseEntity<String>(UUID, HttpStatus.ACCEPTED);
     }
 
     @GetMapping

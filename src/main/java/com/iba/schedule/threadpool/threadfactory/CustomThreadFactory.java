@@ -1,11 +1,10 @@
 package com.iba.schedule.threadpool.threadfactory;
 
-import com.iba.schedule.task.Task;
+import com.iba.schedule.task.interfaces.CancellableRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,7 +31,7 @@ public class CustomThreadFactory implements ThreadFactory {
 
     public Thread newThread(Runnable r) {
 
-        Task task = getTaskFromWorker(r);
+        CancellableRunnable task = getTaskFromWorker(r);
         Thread t = new Thread(group, r,
                 namePrefix + threadNumber.getAndIncrement(),
                 0) {
@@ -50,7 +49,7 @@ public class CustomThreadFactory implements ThreadFactory {
             t.setPriority(Thread.NORM_PRIORITY);
         }
 
-        addThreadToRunningThreads(task.getModel().getId(), t);
+        addThreadToRunningThreads(task.getRunnableUUID(), t);
 
         return t;
     }
@@ -61,13 +60,13 @@ public class CustomThreadFactory implements ThreadFactory {
 
 
     //Kludge
-    private Task getTaskFromWorker(Runnable worker){
+    private CancellableRunnable getTaskFromWorker(Runnable worker){
         try {
             Class<?> workerClass = worker.getClass();
 
             Field firstTask= workerClass.getDeclaredField("firstTask");
             firstTask.setAccessible(true);
-            Task value = (Task) firstTask.get(worker);
+            CancellableRunnable value = (CancellableRunnable) firstTask.get(worker);
 
             return value;
         } catch (IllegalAccessException | NoSuchFieldException e) {
