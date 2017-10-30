@@ -4,11 +4,8 @@ import com.iba.schedule.task.interfaces.CancellableRunnable;
 import com.iba.schedule.threadpool.handler.RejectedExecutionHandlerImpl;
 import com.iba.schedule.threadpool.monitor.MyMonitorThread;
 import com.iba.schedule.threadpool.threadfactory.CustomThreadFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.concurrent.*;
 
 @Service
@@ -55,9 +52,6 @@ public class ThreadPoolManager {
     }
 
     private void tryStartMonitor() {
-//        if (monitorThread == null) {
-//            monitorThread = new Thread(monitor);
-//        }
         if ("NEW".equals(monitorThread.getState().toString()) || "TERMINATED".equals(monitorThread.getState().toString())) {
             monitor.allowRun();
             monitorThread = new Thread(monitor);

@@ -1,6 +1,6 @@
 package com.iba.schedule.task.interfaces;
 
-public interface CancellableRunnable extends Runnable { //why can't extend?
+public interface CancellableRunnable extends Runnable {
 
     void cancel();
 

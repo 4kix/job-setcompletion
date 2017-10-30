@@ -25,7 +25,7 @@ public class Task implements CancellableRunnable {
     public void run() {
         boolean taskStatus = true;
 
-        model.setCurrentStatus("PROCESSING");
+        model.setCurrentStatus("RUNNING");
         logger.info("TASK STARTED");
         try {
             TimeUnit.SECONDS.sleep(15);

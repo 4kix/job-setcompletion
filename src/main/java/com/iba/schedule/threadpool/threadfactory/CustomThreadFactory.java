@@ -70,7 +70,7 @@ public class CustomThreadFactory implements ThreadFactory {
 
             return value;
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            logger.error("this shit doesn't work");
+            logger.error("Extracting Runnable from worker failed");
         }
         return null;
     }
