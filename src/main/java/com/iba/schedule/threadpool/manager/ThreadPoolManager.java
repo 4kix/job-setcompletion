@@ -55,10 +55,12 @@ public class ThreadPoolManager {
     }
 
     private void tryStartMonitor() {
-        if (monitorThread == null) {
-            monitorThread = new Thread(monitor);
-        }
+//        if (monitorThread == null) {
+//            monitorThread = new Thread(monitor);
+//        }
         if ("NEW".equals(monitorThread.getState().toString()) || "TERMINATED".equals(monitorThread.getState().toString())) {
+            monitor.allowRun();
+            monitorThread = new Thread(monitor);
             monitorThread.start();
         }
     }

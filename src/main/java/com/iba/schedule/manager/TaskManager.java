@@ -38,7 +38,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
         Task task = new Task(taskResponseModel);
-        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getId());
+        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getUUID());
         //Thread taskThread = new Thread(task);
         //activeThreads.put(uuid, taskThread);
         activeTasks.put(uuid, task);
@@ -54,17 +54,17 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
         TaskResponseModel taskResponseModel = new TaskResponseModel(UUID);
         Task task = new Task(taskResponseModel);
-        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getId());
+        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getUUID());
         //Thread taskThread = new Thread(task);
         //activeThreads.put(uuid, taskThread);
         activeTasks.put(UUID, task);
         //taskThread.start();
-        try {
-            ThreadPoolManager.getInstance().execute(task);
-        } catch (ExecutionException e) {
-            logger.error("Error: " + e);
-            throw new ExecuteTaskException(e);
-        }
+//        try {
+            threadPoolManager.execute(task);
+//        } catch (ExecutionException e) {
+//            logger.error("Error: " + e);
+//            throw new ExecuteTaskException(e);
+//        }
 
     }
 
