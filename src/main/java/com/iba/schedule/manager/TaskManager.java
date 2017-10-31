@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public TaskResponseModel createTaskModel(String body, String currentState) {
+        clearTaskMap();
         String uuid = uuidGenerator.generateUUID();
         TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
@@ -51,7 +53,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public void createTaskModel(String UUID) {
-
+        clearTaskMap();
         TaskResponseModel taskResponseModel = new TaskResponseModel(UUID);
         Task task = new Task(taskResponseModel);
         logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getUUID());
@@ -85,12 +87,12 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     }
 
     @Override
-    public Object getTaskState(String uuid) {
+    public String getTaskState(String uuid) {
         //parse model or status to the TaskController as a string
-        if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("PROCESSING")) {
-            return "PROCESSING";
+        if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("RUNNING")) {
+            return "RUNNING";
         } else if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
-            return activeTasks.get(uuid).getModel();
+            return activeTasks.get(uuid).getModel().toString();
         }
         //String state = activeTasks.get(uuid).getModel().getCurrentStatus();
         logger.info("Get task state: ");
@@ -104,6 +106,20 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         //activeThreads.remove(uuid); // (Object key, Object value)implementation?
         threadPoolManager.stopThread(uuid);
         activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
+    }
+
+    public void clearTaskMap()
+    {
+        if (activeTasks.size() == 100)
+        {
+            for (ConcurrentHashMap.Entry<String, Task> entry: activeTasks.entrySet())
+            {
+                if (entry.getValue().getModel().getCurrentStatus().equals("OK") || entry.getValue().getModel().getCurrentStatus().equals("INTERRUPTED"))
+                {
+                    activeTasks.remove(entry.getKey());
+                }
+            }
+        }
     }
 
     @Override

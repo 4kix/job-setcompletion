@@ -41,10 +41,14 @@ public class TaskController extends AbstractController<TaskResponseModel>{
     }
 
     @GetMapping
-    public ResponseEntity<Object> getCurrentState(@RequestHeader(value="UUID") String UUID)
+    public ResponseEntity<String> getCurrentState(@RequestHeader(value="UUID") String UUID)
     {
         //String state = abstractManager.getTaskState(UUID);
         logger.info("State os task: " + UUID +" : " );
+        if (abstractManager.getTaskState(UUID).equals("RUNNING"))
+        {
+            return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.PROCESSING);
+        }
         return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.OK);
     }
 

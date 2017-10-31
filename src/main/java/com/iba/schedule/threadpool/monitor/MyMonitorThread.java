@@ -21,6 +21,12 @@ public class MyMonitorThread implements Runnable
 
     public void shutdown(){
         this.run=false;
+        toZeroTimer();
+    }
+
+    public void allowRun()
+    {
+        this.run = true;
     }
 
     @Override

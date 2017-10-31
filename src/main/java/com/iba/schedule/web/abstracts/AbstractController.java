@@ -23,7 +23,7 @@ public abstract class AbstractController<T extends BaseModel> {
 
     public abstract ResponseEntity<String> create(@RequestHeader String UUID);
 
-    public abstract ResponseEntity<Object> getCurrentState(@RequestHeader String UUID);
+    public abstract ResponseEntity<String> getCurrentState(@RequestHeader String UUID);
 
     public abstract ResponseEntity<String> deleteTask(@RequestHeader String UUID);
 
