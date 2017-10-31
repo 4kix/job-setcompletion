@@ -3,11 +3,8 @@ package com.iba.schedule.manager;
 
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
-import com.iba.schedule.task.interfaces.CancellableRunnable;
 import com.iba.schedule.threadpool.manager.ThreadPoolManager;
 import com.iba.schedule.util.UUIDGenerator;
-import com.iba.schedule.exception.ExecuteTaskException;
-import com.iba.schedule.exception.NoSuchTaskException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +12,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Future;
 
 @Component
 public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
-    private ConcurrentMap<String, Task> activeTasks = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, Task> tasks = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, Future<?>> futures = new ConcurrentHashMap<>();
 
     @Autowired
     UUIDGenerator uuidGenerator;
@@ -33,42 +32,44 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         String uuid = uuidGenerator.generateUUID();
         TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
-        Task task = new Task(taskResponseModel);
-        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getUUID());
-        activeTasks.put(uuid, task);
 
-        threadPoolManager.execute(task);
+        Task task = new Task(taskResponseModel);
+        Future<?>  future = threadPoolManager.submitRunnable(task);
+        futures.put(uuid, future);
+
+        logger.info("Create new task(id of TaskResponseModel): " + task.getRunnableUUID());
+        tasks.put(uuid, task);
 
         return taskResponseModel;
     }
 
     @Override
-    public void createTaskModel(String UUID) {
+    public void createTaskModel(String uuid) {
 
-        TaskResponseModel taskResponseModel = new TaskResponseModel(UUID);
+        TaskResponseModel taskResponseModel = new TaskResponseModel(uuid);
         Task task = new Task(taskResponseModel);
-        logger.info("Create new task(id of TaskResponseModel): " + task.getModel().getUUID());
-        activeTasks.put(UUID, task);
-
-        threadPoolManager.execute(task);
+        Future<?>  future = threadPoolManager.submitRunnable(task);
+        logger.info("Create new task(id of TaskResponseModel): " + task.getRunnableUUID());
+        futures.put(uuid, future);
+        tasks.put(uuid, task);
 
     }
 
     @Override
     public String getTaskBody(String uuid) {
-        String body = activeTasks.get(uuid).getModel().getBody();
+        String body = tasks.get(uuid).getModel().getBody();
         logger.info("Get task body: " + body );
         return body;
     }
 
     @Override
     public String getTaskState(String uuid) {
-        if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("RUNNING")) {
+        if (tasks.get(uuid).getModel().getCurrentStatus().equals("RUNNING")) {
             return "RUNNING";
-        } else if (activeTasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
-            return activeTasks.get(uuid).getModel().toString();
+        } else if (tasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
+            return tasks.get(uuid).getModel().toString();
         }
-        //String state = activeTasks.get(uuid).getModel().getCurrentStatus();
+        //String state = tasks.get(uuid).getModel().getCurrentStatus();
         logger.info("Get task state: ");
         return null;
     }
@@ -76,8 +77,10 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     @Override
     public void stopTask(String uuid) {
         //TODO close task and kill thread
-        //activeThreads.remove(uuid); // (Object key, Object value)implementation?
-        threadPoolManager.stopThread(uuid);
-        activeTasks.get(uuid).getModel().setCurrentStatus("STOPPED");
+
+        tasks.get(uuid).cancel();
+        futures.get(uuid).cancel(true);
+        futures.remove(uuid);
+        tasks.get(uuid).getModel().setCurrentStatus("STOPPED");
     }
 }

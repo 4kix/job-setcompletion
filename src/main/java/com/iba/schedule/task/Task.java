@@ -53,7 +53,7 @@ public class Task implements CancellableRunnable {
 
     public void cancel() {
         //TODO close streams and connections
-        logger.info("cancel method invoked");
+        logger.info("Cancel method invoked. Closing connections...");
     }
 
     @Override
