@@ -36,6 +36,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         String uuid = uuidGenerator.generateUUID();
         TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
+
         Task task = new Task(taskResponseModel);
         Future<?>  future = threadPoolManager.submitRunnable(task);
         futures.put(uuid, future);
@@ -77,9 +78,9 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         return null;
     }
 
+    @Override
     public void stopTask(String uuid) {
         //TODO close task and kill thread
-
         tasks.get(uuid).cancel();
         futures.get(uuid).cancel(true);
         futures.remove(uuid);
