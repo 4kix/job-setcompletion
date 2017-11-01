@@ -10,7 +10,7 @@ public class MyMonitorThread implements Runnable
 
     private volatile int timer;
 
-    private boolean run=true;
+    private boolean run = true;
 
     public MyMonitorThread(ThreadPoolExecutor executor, int delay)
     {
@@ -20,14 +20,14 @@ public class MyMonitorThread implements Runnable
     }
 
     public void shutdown(){
-        this.run=false;
+        this.run = false;
         toZeroTimer();
     }
 
-    public void allowRun()
-    {
+    public void allowRun() {
         this.run = true;
     }
+
 
     @Override
     public void run()
