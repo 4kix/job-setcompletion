@@ -1,13 +1,21 @@
 package com.iba.schedule.task;
 
 import com.iba.schedule.model.TaskResponseModel;
+import com.iba.schedule.task.interfaces.CancellableRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 
-public class Task implements Runnable {
+public class Task implements CancellableRunnable {
 
-    private TaskResponseModel model;
+    private volatile TaskResponseModel model;
+
+    private static final Logger logger = LoggerFactory.getLogger(Task.class);
+    private static final AtomicReferenceFieldUpdater<Task, TaskResponseModel> updater =
+            AtomicReferenceFieldUpdater.newUpdater(Task.class, TaskResponseModel.class, "model");
 
     public Task(TaskResponseModel taskResponseModel) {
         this.model = taskResponseModel;
@@ -15,19 +23,41 @@ public class Task implements Runnable {
 
     @Override
     public void run() {
-        model.setCurrentStatus("PROCESSING");
-        System.out.println("THREAD STARTED");
+        boolean taskStatus = true;
+
+        model.setCurrentStatus("RUNNING");
+        logger.info("TASK STARTED");
         try {
-            TimeUnit.MINUTES.sleep(2);
+            TimeUnit.MINUTES.sleep(3);
         } catch (InterruptedException e) {
-            System.err.println("Thread sleep failed");
-            e.printStackTrace();
+            logger.error("Thread sleep failed");
+            taskStatus = false;
+            model.setCurrentStatus("INTERRUPTED");
         }
 
-        model.setCurrentStatus("DONE");
+        if(taskStatus){
+            model.setCurrentStatus("OK");
+            model.setBody("DONE");
+        }
+        logger.info("TASK STOPPED");
+
     }
 
     public TaskResponseModel getModel() {
-        return model;
+        return updater.get(this);
+    }
+
+    public void setModel(TaskResponseModel model) {
+        updater.compareAndSet(this, this.model, model);
+    }
+
+    public void cancel() {
+        //TODO close streams and connections
+        logger.info("Cancel method invoked. Closing connections...");
+    }
+
+    @Override
+    public String getRunnableUUID() {
+        return this.model.getUUID();
     }
 }
