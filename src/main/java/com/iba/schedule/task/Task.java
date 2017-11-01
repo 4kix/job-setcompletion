@@ -28,7 +28,7 @@ public class Task implements CancellableRunnable {
         model.setCurrentStatus("RUNNING");
         logger.info("TASK STARTED");
         try {
-            TimeUnit.SECONDS.sleep(15);
+            TimeUnit.MINUTES.sleep(3);
         } catch (InterruptedException e) {
             logger.error("Thread sleep failed");
             taskStatus = false;

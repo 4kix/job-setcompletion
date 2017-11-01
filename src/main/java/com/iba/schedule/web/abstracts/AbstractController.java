@@ -25,7 +25,7 @@ public abstract class AbstractController<T extends BaseModel> {
 
     public abstract ResponseEntity<String> getCurrentState(@RequestHeader String UUID);
 
-    public abstract ResponseEntity<String> stopTask(@RequestHeader String UUID);
+    public abstract ResponseEntity<Void> stopTask(@RequestHeader String UUID);
 
 
 }

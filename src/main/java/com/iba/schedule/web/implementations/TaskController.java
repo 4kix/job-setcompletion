@@ -40,15 +40,19 @@ public class TaskController extends AbstractController<TaskResponseModel>{
     {
         //String state = abstractManager.getTaskState(UUID);
         logger.info("State os task: " + UUID +" : " );
+        if (abstractManager.getTaskState(UUID).equals("RUNNING"))
+        {
+            return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.PROCESSING);
+        }
         return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<String> stopTask(@RequestHeader(value="UUID") String UUID)
+    public ResponseEntity<Void> stopTask(@RequestHeader(value="UUID") String UUID)
     {
         abstractManager.stopTask(UUID);
         logger.info("Stop task: " + UUID);
-        return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
