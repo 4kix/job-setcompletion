@@ -17,15 +17,7 @@ public class TaskController extends AbstractController<TaskResponseModel>{
 
     private AbstractManager<TaskResponseModel> abstractManager;
 
-    public TaskController(AbstractManager<TaskResponseModel> abstractManager) {this.abstractManager = abstractManager ;}
-
-    @PutMapping
-    public ResponseEntity<String> create(@RequestBody TaskResponseModel task)
-    {
-        TaskResponseModel taskResponse = abstractManager.createTaskModel(task.getBody(), task.getCurrentStatus());
-        logger.info("Run task: " + taskResponse.getUUID());
-        return new ResponseEntity<>(taskResponse.getUUID(), HttpStatus.ACCEPTED);
-    }
+    public TaskController(AbstractManager<TaskResponseModel> abstractManager) { super(abstractManager);}
 
     @PostMapping
     public ResponseEntity<String> create(@RequestHeader String UUID)
@@ -38,13 +30,13 @@ public class TaskController extends AbstractController<TaskResponseModel>{
     @GetMapping
     public ResponseEntity<String> getCurrentState(@RequestHeader(value="UUID") String UUID)
     {
-        //String state = abstractManager.getTaskState(UUID);
-        logger.info("State os task: " + UUID +" : " );
-        if (abstractManager.getTaskState(UUID).equals("RUNNING"))
+        String state = abstractManager.getTaskState(UUID);
+        logger.info("State os task: " + UUID +" : " + state );
+        if (state.equals("RUNNING"))
         {
-            return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.PARTIAL_CONTENT);
+            return new ResponseEntity<>(state, HttpStatus.PARTIAL_CONTENT); //or just HTTP Status
         }
-        return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.OK);
+        return new ResponseEntity<>(state, HttpStatus.OK);
     }
 
     @DeleteMapping
@@ -54,5 +46,4 @@ public class TaskController extends AbstractController<TaskResponseModel>{
         logger.info("Stop task: " + UUID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }
