@@ -17,7 +17,10 @@ public class TaskController extends AbstractController<TaskResponseModel>{
 
     private AbstractManager<TaskResponseModel> abstractManager;
 
-    public TaskController(AbstractManager<TaskResponseModel> abstractManager) { super(abstractManager);}
+    public TaskController(AbstractManager<TaskResponseModel> abstractManager) {
+        super(abstractManager);
+        this.abstractManager = abstractManager;
+    }
 
     @PostMapping
     public ResponseEntity<String> create(@RequestHeader String UUID)
