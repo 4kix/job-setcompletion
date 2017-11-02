@@ -36,7 +36,6 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         String uuid = uuidGenerator.generateUUID();
         TaskResponseModel taskResponseModel = new TaskResponseModel(uuid, body, currentState);
 
-
         Task task = new Task(taskResponseModel);
         Future<?>  future = threadPoolManager.submitRunnable(task);
         futures.put(uuid, future);
