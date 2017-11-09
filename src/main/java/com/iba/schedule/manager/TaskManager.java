@@ -67,14 +67,14 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public String getTaskState(String uuid) {
-        if (tasks.get(uuid).getModel().getCurrentStatus().equals("RUNNING")) {
-            return "RUNNING";
-        } else if (tasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
+        if (tasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
             return tasks.get(uuid).getModel().toString();
+        } else {
+            return tasks.get(uuid).getModel().getCurrentStatus();
         }
         //String state = tasks.get(uuid).getModel().getCurrentStatus();
-        logger.info("Get task state: ");
-        return null;
+//        logger.info("Get task state: ");
+//        return null;
     }
 
     @Override
@@ -83,7 +83,6 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
         tasks.get(uuid).cancel();
         futures.get(uuid).cancel(true);
         futures.remove(uuid);
-        tasks.get(uuid).getModel().setCurrentStatus("STOPPED");
     }
 
     public void clearTaskMap()

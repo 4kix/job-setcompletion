@@ -40,7 +40,7 @@ public class TaskController extends AbstractController<TaskResponseModel>{
     {
         //String state = abstractManager.getTaskState(UUID);
         logger.info("State os task: " + UUID +" : " );
-        if (abstractManager.getTaskState(UUID).equals("RUNNING"))
+        if (!abstractManager.getTaskState(UUID).equals("OK"))
         {
             return new ResponseEntity<>(abstractManager.getTaskState(UUID), HttpStatus.PARTIAL_CONTENT);
         }
