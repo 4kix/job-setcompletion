@@ -18,10 +18,16 @@ public class ThreadPoolManager {
 
     ThreadPoolManager() {
         rejectionHandler = new RejectedExecutionHandlerImpl();
-        threadFactory = Executors.defaultThreadFactory();  //new CustomThreadFactory();
+        threadFactory = Executors.defaultThreadFactory();
 
         //TODO choose normal executor parameters
-        executorPool = new ThreadPoolExecutor(2, 100, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3), threadFactory, rejectionHandler);
+        executorPool = new ThreadPoolExecutor(2,
+                100,
+                1,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(100),
+                threadFactory,
+                rejectionHandler);
         executorPool.allowCoreThreadTimeOut(true);
         monitor = new MyMonitorThread(executorPool, 5);
         monitorThread = new Thread(monitor);

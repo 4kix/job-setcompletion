@@ -1,6 +1,5 @@
 package com.iba.schedule.manager;
 
-
 import com.iba.schedule.model.TaskResponseModel;
 import com.iba.schedule.task.Task;
 import com.iba.schedule.threadpool.manager.ThreadPoolManager;
@@ -10,9 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
@@ -67,19 +63,16 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
 
     @Override
     public String getTaskState(String uuid) {
+        logger.info("Getting task state...");
         if (tasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
             return tasks.get(uuid).getModel().toString();
         } else {
             return tasks.get(uuid).getModel().getCurrentStatus();
         }
-        //String state = tasks.get(uuid).getModel().getCurrentStatus();
-//        logger.info("Get task state: ");
-//        return null;
     }
 
     @Override
     public void stopTask(String uuid) {
-        //TODO close task and kill thread
         tasks.get(uuid).cancel();
         futures.get(uuid).cancel(true);
         futures.remove(uuid);
