@@ -23,13 +23,8 @@ public class Task implements CancellableRunnable {
 
         model.get().setCurrentStatus("RUNNING");
         logger.info("TASK STARTED");
-        try {
-            TimeUnit.MINUTES.sleep(3);
-        } catch (InterruptedException e) {
-            logger.error("Thread sleep failed");
-            taskStatus = false;
-            model.get().setCurrentStatus("INTERRUPTED");
-        }
+
+        //TODO invoke URL with RestTemplate
 
         if(taskStatus){
             model.get().setCurrentStatus("OK");

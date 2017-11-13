@@ -45,8 +45,8 @@ public class TaskController extends AbstractController<TaskResponseModel>{
     @DeleteMapping
     public ResponseEntity<Void> stopTask(@RequestHeader(value="UUID") String UUID)
     {
-        abstractManager.stopTask(UUID);
-        logger.info("Stop task: " + UUID);
+//        abstractManager.stopTask(UUID);
+//        logger.info("Stop task: " + UUID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
