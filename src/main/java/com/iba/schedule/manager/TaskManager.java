@@ -65,7 +65,7 @@ public class TaskManager extends AbstractManager<TaskResponseModel> {
     public String getTaskState(String uuid) {
         logger.info("Getting task state...");
         if (tasks.get(uuid).getModel().getCurrentStatus().equals("OK")) {
-            return tasks.get(uuid).getModel().toString();
+            return tasks.get(uuid).getModel().getBody();
         } else {
             return tasks.get(uuid).getModel().getCurrentStatus();
         }
